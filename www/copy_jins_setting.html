@@ -1,0 +1,64 @@
+ <!-- Tilt&swingタブ -->
+    <ons-page>
+          <!-- タブバー -->
+   <!-- <ons-tabbar position="top" id="tabbar">
+      <ons-tab label="首振り" page="" icon="fa-user" class ="tab_menu"  active></ons-tab>
+      <ons-tab label="まばたき" page="" icon="fa-eye" class ="tab_menu" ></ons-tab>
+      <ons-tab label="姿勢" page="" icon="fa-child" class ="tab_menu" ></ons-tab>
+    </ons-tabbar>-->
+      <!-- 看板画像 -->
+          <img src="images/topimg_check.jpg" width="100%">
+
+          <!-- JINS-MEME 測定 -->
+
+ 
+        <div class="waku">
+          <h2 class="checker_title">首振りカウント判定</h2>
+          <h3 class="result_title" class="result_title">首ふり（横）</h3>
+          <h4 id="swing_lat_dtl_msg" class="result_title">ーー<small>回</small></h4>
+          <h3 class="result_title" class="result_title">首ふり（縦）</h3>
+          <h4 id="swing_long_dtl_msg" class="result_title">ーー<small>回</small></h4>
+          <span id="swing-long-result" class="result_description"></span>
+        </div>
+
+        <div class="waku">
+          <h2 class="checker_title">目</h2>
+          <h3 class="result_title" class="result_title">まばたき</h3>
+          <h4 id="tilt_result_msg" class="result_title">ーー<small>回</small></h4>
+          <h3 class="result_title" class="result_title">視線移動（横）</h3>
+          <h4 id="em_lat_dtl_msg" class="result_title">ーー<small>度</small></h4>
+          <h3 class="result_title" class="result_title">視線移動（縦）</h3>
+          <h4 id="em_long_dtl_msg" class="result_title">ーー<small>度</small></h4>
+        </div>
+        <div class="waku">
+          <h2 class="checker_title">居眠り検出</h2>
+          <h3 id="sleeping-eye" class="result_title">ーー</h3>
+          <h4 id="tilt_result_msg" class="result_title">ーー<small></small></h4>
+          <!-- <span id="sleeping-eye-result" class="result_description">説明が入ります。</span>-->
+
+          <div class="space_h30"></div>
+          <h3 id="sleeping_msg" class="result_title">ーー</h3>
+          <h4 id="tilt_result_msg" class="result_title">ーー<small></small></h4>
+          <!-- <span id="sleeping-msg-result" class="result_description">説明が入ります。</span>-->
+        </div>
+
+        <div class="waku">
+          <h2 class="checker_title">運転姿勢判定</h2>
+          <h3 id="tilt_msg" class="result_title">前傾角度(Tilt)</h3>
+          <h4 id="tilt_result_msg" class="result_title">ーー<small></small></h4>
+          <!-- <span id="sleeping-eye-result" class="result_description">説明が入ります。</span>-->
+        </div>
+        <div class="waku">
+          <h2 class="checker_title">姿勢前傾</h2>
+          <h3 id="tilt_msg" class="result_title">前傾角度(Tilt)</h3>
+          <h4 id="tilt_result_msg" class="result_title">ーー<small>度</small></h4>
+          <!-- <span id="sleeping-eye-result" class="result_description">説明が入ります。</span>-->
+
+          <div class="space_h30"></div>
+          <h2 class="checker_title">姿勢左右</h2>
+          <h3 id="tilt_msg" class="result_title">左右角度(Sequential)</h3>
+          <h4 id="tilt_result_msg" class="result_title">ーー<small></small></h4>
+          <!-- <span id="yaw-result" class="result_description">説明が入ります。</span>-->
+        </div>
+      </div>
+    </ons-page>

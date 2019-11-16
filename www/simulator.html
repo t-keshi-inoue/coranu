@@ -1,0 +1,123 @@
+  <!-- SDL値設定タブ -->
+    <ons-page id="check-setting">
+       <!-- 看板画像 -->
+          <img src="images/topimg_check.jpg" width="100%">
+      <div id="simulator">
+<h3>SDL Simulator <br><Small>(SDL Bootcamp に送信) </Small></h3>
+        <form id="target">
+            <fieldset>
+                <legend>RPM</legend>
+                <input
+                    type="range"
+                    value="0"
+                    min="0"
+                    max="20000"
+                    step="1"
+                    oninput="document.getElementsByName('rpm')[0].value=this.value;changeRpm();"
+                />
+                <output name="rpm">0</output> rpm
+            </fieldset>
+            <fieldset>
+                <legend>Speed</legend>
+                <input
+                    type="range"
+                    value="0"
+                    min="0"
+                    max="700"
+                    step="0.01"
+                    oninput="document.getElementsByName('speed')[0].value=this.value;changeSpeed();"
+                />
+                <output name="speed">0</output> km/h
+            </fieldset>
+
+            <fieldset>
+                <legend>Acc Pedal Position</legend>
+                <input
+                    type="range"
+                    value="0"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    oninput="document.getElementsByName('accPedalPosition')[0].value=this.value;changeAccPedalPosition();"
+                />
+                <output name="accPedalPosition">0</output> %
+            </fieldset>
+
+            <fieldset>
+                <legend>Electronic Park Brake Status</legend>
+                <INPUT
+                    TYPE="Radio"
+                    Name="electronicParkBrakeStatus"
+                    onchange="changeElectronicParkBrakeStatus()"
+                    Value="CLOSE"
+                    checked
+                />close
+                <INPUT
+                    TYPE="Radio"
+                    Name="electronicParkBrakeStatus"
+                    onchange="changeElectronicParkBrakeStatus()"
+                    Value="OPEN"
+                />open
+            </fieldset>
+
+            <fieldset>
+                <legend>PRNDL</legend>
+                <INPUT
+                    TYPE="Radio"
+                    Name="prndl"
+                    onchange="changePrndl()"
+                    Value="PARK"
+                    checked
+                />Park
+                <INPUT
+                    TYPE="Radio"
+                    Name="prndl"
+                    onchange="changePrndl()"
+                    Value="REVERSE"
+                />Reverse
+                <INPUT
+                    TYPE="Radio"
+                    Name="prndl"
+                    onchange="changePrndl()"
+                    Value="NEUTRAL"
+                />Neutral
+                <INPUT
+                    TYPE="Radio"
+                    Name="prndl"
+                    onchange="changePrndl()"
+                    Value="DRIVE"
+                />Drive
+            </fieldset>
+
+            <fieldset>
+                <legend>TurnSignal</legend>
+                <INPUT
+                    TYPE="Radio"
+                    Name="turnSignal"
+                    onchange="changeTurnSignal()"
+                    Value="LEFT"
+                />left
+                <INPUT
+                    TYPE="Radio"
+                    Name="turnSignal"
+                    onchange="changeTurnSignal()"
+                    Value="OFF"
+                    checked
+                />off
+                <INPUT
+                    TYPE="Radio"
+                    Name="turnSignal"
+                    onchange="changeTurnSignal()"
+                    Value="RIGHT"
+                />right |
+                <INPUT
+                    TYPE="Radio"
+                    Name="turnSignal"
+                    onchange="changeTurnSignal()"
+                    Value="BOTH"
+                />both
+            </fieldset>
+        </form>
+        <button class="btn_darkblue">登録</button>
+      </div>
+    </ons-page>

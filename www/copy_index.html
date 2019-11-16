@@ -1,0 +1,288 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+  <script src="components/loader.js"></script>
+  <script src="jmctrllib.js"></script>
+
+  <!--JINE-MEME処理JS-->
+  <script>
+// JINES-MEME 関連
+
+  // 起動時のイベント
+    document.addEventListener('deviceready', () => {
+        // 必要な権限の確認 for Android
+        cordova.plugins.diagnostic.requestLocationAuthorization(function(status){
+          switch(status){
+            case cordova.plugins.diagnostic.permissionStatus.NOT_REQUESTED:
+                console.log("Permission not requested");
+                break;
+            case cordova.plugins.diagnostic.permissionStatus.GRANTED:
+                console.log("Permission granted");
+                break;
+            case cordova.plugins.diagnostic.permissionStatus.DENIED_ONCE:
+                console.log("Permission denied");
+                break;
+            case cordova.plugins.diagnostic.permissionStatus.DENIED_ALWAYS:
+                console.log("Permission permanently denied");
+                break;
+          }
+        }, function(error){
+          console.error(error);
+        });
+
+        // アプリの初期化処理
+        cordova.plugins.JinsMemePlugin.setAppClientID(
+            '128428234763180', //client id
+            'dq1f8z3t6byeykfed5rimiaoq0s3tjhr', //secret
+            () => {
+                restartScan();
+            },
+            () => {
+                console.log('Error: setAppClientID');
+            }
+        );
+    });
+
+    // iPhoneX 対応
+    ons.ready(() => {
+        if (ons.platform.isIPhoneX) {
+          document.documentElement.setAttribute('onsflag-iphonex-portrait', '');
+        }
+    });
+    
+    //首ふり（横）のイベントリスナ
+    document.addEventListener('jmctrllib_swing_lat', e => {
+        document.getElementById("swing_lat_dtl_dir").innerHTML = "lat direction:" + e.detail.direction + "<small>度</small>";
+
+        document.getElementById("swing_lat_dtl_cnt").innerHTML =  e.detail.count +"<small>回</small>";
+    });
+    //首ふり（縦）のイベントリスナ
+    document.addEventListener('jmctrllib_swing_long', e => {
+        document.getElementById("swing_long_dtl_dir").innerHTML = "long direction:" + e.detail.direction + "<small>度</small>";
+        
+        document.getElementById("swing_long_dtl_cnt").innerHTML =  e.detail.count +"<small>回</small>";
+    });
+    //視線移動（横）のイベントリスナ
+    document.addEventListener('jmctrllib_eyemove_lat', e => {
+         document.getElementById("em_lat_dtl_dir").innerHTML = "long direction:" + e.detail.direction + "<small>度</small>";
+        
+        document.getElementById("em_lat_dtl_cnt").innerHTML =  e.detail.count +"<small>回</small>";
+    });
+    //視線移動（縦）のイベントリスナ
+    document.addEventListener('jmctrllib_eyemove_long', e => {
+        document.getElementById("em_long_dtl_dir").innerHTML = "long direction:" + e.detail.direction + "<small>度</small>";
+        
+        document.getElementById("em_long_dtl_cnt").innerHTML =  e.detail.count +"<small>回</small>";
+    });
+
+
+
+    // デバイスのスキャン開始
+    const startScan = () => {
+        // デバイス選択ダイアログを表示
+        const deviceList = document.getElementById('deviceList');
+        deviceList.innerHTML = '<ons-list-header>デバイスを選択</ons-list-header>';
+        document.getElementById('selectDeviceDialog').show();
+        
+        cordova.plugins.JinsMemePlugin.startScan(device => {
+            // ダイアログにデバイスを追加
+            deviceList.innerHTML += "<ons-list-item tappable onclick=\"connect('" + device + "')\">" + device + "</ons-list-item>";
+        }, () => {
+            console.log('Error: startScan');
+        });
+    }
+    
+    // デバイスのスキャン停止
+    const stopScan = successCallback => {
+        cordova.plugins.JinsMemePlugin.stopScan(() => {
+            if(successCallback) successCallback();
+        }, () => {
+            console.log('Error: stopScan');
+        });
+    }
+    
+    // デバイスのスキャン再開
+    const restartScan = () => {
+        stopDataReport();
+        disconnect();
+        stopScan(startScan);
+    }
+    
+    // アプリとデバイスの接続
+    const connect = device => {
+        // スキャン停止
+        stopScan();
+        // ダイアログを閉じてモーダルを表示
+        document.getElementById('selectDeviceDialog').hide();
+        document.getElementById('modal').show();
+                
+        // 選択されたデバイスに接続
+        cordova.plugins.JinsMemePlugin.connect(device, () => {
+            //端末依存で不安定な場合があるのでウェイトをかける処理
+            setTimeout(stopDataReport, 500);
+            setTimeout(startDataReport, 1000);
+        }, () => {
+            console.log('Disconnect');
+        }, () => {
+            console.log('Error: connect');
+            document.getElementById('modal').hide();
+        });
+    }
+    
+    // アプリとデバイスの切断
+    const disconnect = () => {
+        cordova.plugins.JinsMemePlugin.disconnect(() => {
+          //do nothing now
+        }, () => {
+            console.log('Error: disconnect');
+        });
+    }
+    
+    // 計測開始
+    const startDataReport = () => {
+        document.getElementById('modal').hide();
+        cordova.plugins.JinsMemePlugin.startDataReport(data => {
+            //首振りカウント判定＆イベント発火用
+            jmctrllib.getSequentialSwing(data);
+            //視線移動カウント判定＆イベント発火用
+            jmctrllib.getSequentialEyeMove(data);
+            //前傾角の取得と表示
+            const tilt = jmctrllib.calcTilt(data);
+            document.getElementById("tilt_msg").innerHTML = "tilt:" + Math.round(tilt) + "deg";
+            document.getElementById("yaw_seq_msg").innerHTML = "yaw:" + Math.round(jmctrllib.getSequentialYaw(data)) ;
+        }, () => {
+            console.log('Error: startDataReport');
+        });
+    }
+
+    // 計測停止
+    const stopDataReport = () => {
+        cordova.plugins.JinsMemePlugin.stopDataReport(() => {
+          //do nothing now
+        }, () => {
+            console.log('Error: stopDataReport');
+        });
+    }
+
+    // 計測結果を描画する
+    const draw = data => {
+            // まばたきされたらアイコンを変更する
+            if(data.blinkSpeed > 0 || data.blinkStrength > 0) {
+                document.getElementById('icon-eye').setAttribute('icon', 'eye-slash');
+            } else(data.blinkSpeed > 0 || data.blinkStrength > 0) {
+                document.getElementById('icon-eye').setAttribute('icon', 'eye-slash');
+            } else if {
+                document.getElementById('icon-eye').setAttribute('icon', 'eye-eleeping');
+            }
+            // 姿勢角Rollに合わせてアイコンを傾ける
+            const deg = data.roll * -1;
+            document.getElementById('icon-body').style['transform'] = `rotate(${deg}deg)`;
+    }
+
+
+    // プラグアイコン押下時
+    const reconnect = () => {
+        ons.notification.confirm("切断＆再接続しますか？")
+        .then(result => {
+           if(result) {
+               restartScan();
+           }
+        });
+    }
+
+  </script>
+
+  <!--クイズ処理JS-->
+  <script src="js/quiz.js"></script>
+   <!--共通-->
+  <script src="js/app.js"></script>
+  <link rel="stylesheet" href="components/loader.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+<script>
+// APIキーの設定とSDK初期化
+var ncmb = new NCMB("2dd3d31c42f40b277f40e9158c900d68121161db94f963d53bcb004f1c68f04b","7fe0bc6855dd3ee981e5af978cc69476430cff4c57d3f243d5df85305eb2dee4");
+
+
+    ons.bootstrap();
+
+    ons.ready(function() {
+    console.log("Onsen UI is ready!");
+    });
+
+    document.addEventListener('show', function(event) {
+    var page = event.target;
+    var titleElement = document.querySelector('#toolbar-title');
+
+    if (page.matches('home.html')) {
+      titleElement.innerHTML = 'HOME';
+    } else if (page.matches('check.html')) {
+      titleElement.innerHTML = '免許チェック';
+    } else if (page.matches('quiz.html')) {
+      titleElement.innerHTML = 'クイズ';
+    } else if (page.matches('score.html')) {
+      titleElement.innerHTML = 'スコア';
+    }else if (page.matches('setting.html')) {
+      titleElement.innerHTML = '設定';
+    }
+    });
+
+  </script>
+
+</head>
+<body>
+  <!-- スタック -->
+  <ons-navigator var="myNavigator" page="index.html"></ons-navigator> 
+
+
+    <!-- ツールバー -->
+  <ons-page>
+    <ons-toolbar>
+      <div class="toolbar__left toolbar--material__left">
+       <span class="toolbar-button toolbar-button--material">
+          <i class="zmdi zmdi-menu white"></i>
+        </span>
+      </div>
+      <div id="toolbar-title" class="center white">優良ドライバーチェッカー</div>
+      <div class="right">
+        <ons-toolbar-button>
+            <ons-icon icon="fa-plug" size="24px" onclick="reconnect()" class="white"></ons-icon>
+        </ons-toolbar-button>
+      </div>
+   </ons-toolbar>
+
+
+
+
+    <!-- タブバー -->
+    <ons-tabbar position="bottom" id="menu">
+            <ons-tab label="Home" page="home.html" icon="ion-home" active></ons-tab>
+            <ons-tab label="Driving-Test" page="driving_test.html" icon="fa-car"></ons-tab>
+            <ons-tab label="Quiz" page="quiz.html" icon="fa-question-circle"></ons-tab>
+            <!-- <ons-tab label="history" page="history.html" icon="fa-calendar-alt"></ons-tab>       -->
+            <!-- <ons-tab label="Score" page="score.html" icon="fa-chart-pie"></ons-tab>-->
+            <ons-tab label="Setting" page="jins_setting.html" icon="fa-glasses"></ons-tab>
+            <ons-tab label="Adviser" page="adviser_select.html" icon="fa-user"></ons-tab>
+            <ons-tab label="SDL値設定" page="simulator.html" icon="fa-sliders-h"></ons-tab>
+        </ons-tabbar>
+    </ons-page>
+
+
+  <!-- デバイス選択ダイアログ -->
+  <ons-dialog id="selectDeviceDialog" cancelable>
+    <ons-list id="deviceList">
+    </ons-list>
+  </ons-dialog>
+  
+  <!-- モーダルウィンドウ -->
+  <ons-modal id="modal">
+    <p>接続中...</p>
+    <ons-icon icon="spinner" size="28px" spin></ons-icon>
+  </ons-modal>
+
+  
+</body>
+</html>

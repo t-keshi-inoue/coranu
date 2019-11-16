@@ -1,0 +1,21 @@
+// quiz-result
+
+<ons-page>
+      <img src="images/topimg_quiz1.jpg" width="100%">
+      <div class="space_h30"></div>
+	<div ng-controller="resultCtrl as result">
+		<ons-toolbar>
+			<div class="center">
+				結果発表
+			</div>
+		</ons-toolbar>
+		<div class="result">
+			<p class="detail">{{result.items.totalNum}} 問中 {{result.items.rightNum}} 問正解</p>
+			<p class="score"><span>{{result.items.score}}</span> point</p>
+		</div>
+		<div class="back-btn">
+			<ons-button modifier="large" ng-click="result.backTop()">トップへ戻る
+			</ons-button>
+		</div>
+	</div>
+</ons-page>
