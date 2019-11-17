@@ -1,5 +1,24 @@
 //タブバーの設定など
-
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500,500italic,700,700italic' rel='stylesheet' type='text/css'>
+  <meta http-equiv="Content-Security-Policy" content="default-src * data:; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+  <link rel="stylesheet" href="css/onsenui.css">
+  <link rel="stylesheet" href="css/onsen-css-components.css">
+  <style>
+    .page__background {
+      background-color: white;
+    }
+  </style>
+</head>
+ 
+<body>
+  <div id="app"></div>
+  <script src="bundle.js"></script>
+</body>
+</html>
 
 <!DOCTYPE HTML>
 <html>
@@ -19,242 +38,6 @@
   <link rel="stylesheet" href="css/style.css">
 
 <script>
-//---------------- JINES-MEMEここから----------------------
-// JINES-MEME 関連
-
-  // 起動時のイベント
-    document.addEventListener('deviceready', () => {
-        // 必要な権限の確認 for Android
-        cordova.plugins.diagnostic.requestLocationAuthorization(function(status){
-          switch(status){
-            case cordova.plugins.diagnostic.permissionStatus.NOT_REQUESTED:
-                console.log("Permission not requested");
-                break;
-            case cordova.plugins.diagnostic.permissionStatus.GRANTED:
-                console.log("Permission granted");
-                break;
-            case cordova.plugins.diagnostic.permissionStatus.DENIED_ONCE:
-                console.log("Permission denied");
-                break;
-            case cordova.plugins.diagnostic.permissionStatus.DENIED_ALWAYS:
-                console.log("Permission permanently denied");
-                break;
-          }
-        }, function(error){
-          console.error(error);
-        });
-
-        // アプリの初期化処理
-        cordova.plugins.JinsMemePlugin.setAppClientID(
-            '128428234763180', //client id
-            'dq1f8z3t6byeykfed5rimiaoq0s3tjhr', //secret
-            () => {
-                restartScan();
-            },
-            () => {
-                console.log('Error: setAppClientID');
-            }
-        );
-    });
-
-    // iPhoneX 対応
-    ons.ready(() => {
-        if (ons.platform.isIPhoneX) {
-          document.documentElement.setAttribute('onsflag-iphonex-portrait', '');
-        }
-    });
-    
-//首ふり（横）のイベントリスナ
-    document.addEventListener('jmctrllib_swing_lat', e => {
-        document.getElementById("swing_lat_dtl_dir").innerHTML = "lat direction:" + e.detail.direction + "<small>度</small>";
-
-        document.getElementById("swing_lat_dtl_cnt").innerHTML =  e.detail.count +"<small>回</small>";
-    });
-    //首ふり（縦）のイベントリスナ
-    document.addEventListener('jmctrllib_swing_long', e => {
-        document.getElementById("swing_long_dtl_dir").innerHTML = "long direction:" + e.detail.direction + "<small>度</small>";
-        
-        document.getElementById("swing_long_dtl_cnt").innerHTML =  e.detail.count +"<small>回</small>";
-    });
-
-const e.detail.direction = 30;
-
-    //視線移動（横）のイベントリスナ
-    document.addEventListener('jmctrllib_eyemove_lat', e => {
-         document.getElementById("em_lat_dtl_dir").innerHTML = "lat direction:" + e.detail.direction + "<small>度</small>";
-        
-        document.getElementById("em_lat_dtl_cnt").innerHTML =  e.detail.count +"<small>回</small>";
-    });
-    //視線移動（縦）のイベントリスナ
-    document.addEventListener('jmctrllib_eyemove_long', e => {
-        document.getElementById("em_long_dtl_dir").innerHTML = "long direction:" + e.detail.direction + "<small>度</small>";
-        
-        document.getElementById("em_long_dtl_cnt").innerHTML =  e.detail.count +"<small>回</small>";
-    });
-
-    //まばたきの速さイベントリスナ
-   /* document.addEventListener('jmctrllib_blinkSpeed', e => {
-        // まばたき
-        document.getElementById("blinkSpeed_value").innerHTML = data.blinkSpeed;
-    });
-
-    //まばたきの強さイベントリスナ
-    document.addEventListener('jmctrllib_blinkStrength', e => {
-        // まばたきの強さ
-        document.getElementById("blinkStrength_value").innerHTML = data.blinkStrength;
-    });*/
-
-    // デバイスのスキャン開始
-    const startScan = () => {
-        // デバイス選択ダイアログを表示
-        const deviceList = document.getElementById('deviceList');
-        deviceList.innerHTML = '<ons-list-header>デバイスを選択</ons-list-header>';
-        document.getElementById('selectDeviceDialog').show();
-        
-        cordova.plugins.JinsMemePlugin.startScan(device => {
-            // ダイアログにデバイスを追加
-            deviceList.innerHTML += "<ons-list-item tappable onclick=\"connect('" + device + "')\">" + device + "</ons-list-item>";
-        }, () => {
-            console.log('Error: startScan');
-        });
-    }
-    
-    // デバイスのスキャン停止
-    const stopScan = successCallback => {
-        cordova.plugins.JinsMemePlugin.stopScan(() => {
-            if(successCallback) successCallback();
-        }, () => {
-            console.log('Error: stopScan');
-        });
-    }
-
-// データ送信結果を描画する
-const draw = data => {
-    let tabIndex = document.getElementById('tabbar').getActiveTabIndex();
-
-        // まばたきされたらアイコンを変更する
-        if(data.blinkSpeed > 0 || data.blinkStrength > 0) {
-            document.getElementById('icon-eye').setAttribute('icon', 'eye-slash');
-        } else {
-            document.getElementById('icon-eye').setAttribute('icon', 'eye');
-        }
-
-        // 姿勢角Rollに合わせてアイコンを傾ける
-        const deg = data.roll * -1;
-        document.getElementById('icon-body').style['transform'] = `rotate(${deg}deg)`;
-        }
-
-
-        
-    // デバイスのスキャン再開
-    const restartScan = () => {
-        stopDataReport();
-        disconnect();
-        stopScan(startScan);
-    }
-    
-    // アプリとデバイスの接続
-    const connect = device => {
-        // スキャン停止
-        stopScan();
-        // ダイアログを閉じてモーダルを表示
-        document.getElementById('selectDeviceDialog').hide();
-        document.getElementById('modal').show();
-                
-        // 選択されたデバイスに接続
-        cordova.plugins.JinsMemePlugin.connect(device, () => {
-            //端末依存で不安定な場合があるのでウェイトをかける処理
-            setTimeout(stopDataReport, 500);
-            setTimeout(startDataReport, 1000);
-        }, () => {
-            console.log('Disconnect');
-        }, () => {
-            console.log('Error: connect');
-            document.getElementById('modal').hide();
-        });
-    }
-    
-    // アプリとデバイスの切断
-    const disconnect = () => {
-        cordova.plugins.JinsMemePlugin.disconnect(() => {
-          //do nothing now
-        }, () => {
-            console.log('Error: disconnect');
-        });
-    }
-    
-    // 計測開始
-    const startDataReport = () => {
-        document.getElementById('modal').hide();
-        cordova.plugins.JinsMemePlugin.startDataReport(data => {
-            //首振りカウント判定＆イベント発火用
-            jmctrllib.getSequentialSwing(data);
-            //視線移動カウント判定＆イベント発火
-            jmctrllib.getSequentialEyeMove(data);
-                        draw(data);
-            //前傾角の取得と表示
-            /*const tilt = jmctrllib.calcTilt(data);
-            if(tilt < 0) {
-                frontOrBack = "後反り:";
-            }else if(tilt > 0) {
-                frontOrBack = "前屈み:";
-            }else{
-                frontOrBack = "直立：";
-            }*/
-
-            document.getElementById("tilt_result_msg").innerHTML = Math.round(tilt) + "<small>度</small>";
-
-            const yaw = jmctrllib.getSequentialYaw(data);
-            /*let leftOrRight = "";
-            if(yaw < 90) {
-                leftOrRight = "左向き：";
-                yaw = 90 - yaw;
-            }else if(yaw > 90) {
-                leftOrRight = "右向き：";
-                yaw = yaw - 90;
-            }if(yaw <= 0) {
-                leftOrRight = "超左向き：";
-                yaw = 90 + (-1 * yaw) 
-            }else if(yaw > 180) {
-                leftOrRight = "超右向き：";
-                yaw = 90 + yaw;
-            }else{
-                leftOrRight = "正面：";
-                yaw = 0;
-            }*/
-
-            document.getElementById("yaw_seq_msg").innerHTML = Math.round(yaw)+ "<small>度</small>";
-
-        }, () => {
-            console.log('Error: startDataReport');
-        });
-    }
-
-    // 計測停止
-    const stopDataReport = () => {
-        cordova.plugins.JinsMemePlugin.stopDataReport(() => {
-          //do nothing now
-        }, () => {
-            console.log('Error: stopDataReport');
-        });
-    }
-    
-    // プラグアイコン押下時
-    const reconnect = () => {
-        ons.notification.confirm("切断＆再接続しますか？")
-        .then(result => {
-           if(result) {
-               restartScan();
-           }
-        });
-    }
-
-//---------------- JINES-MEMEここまで----------------------
-
-
-// APIキーの設定とSDK初期化
-var ncmb = new NCMB("2dd3d31c42f40b277f40e9158c900d68121161db94f963d53bcb004f1c68f04b","7fe0bc6855dd3ee981e5af978cc69476430cff4c57d3f243d5df85305eb2dee4");
-
     ons.ready(function() {
     console.log("Onsen UI is ready!");
     });
@@ -275,9 +58,9 @@ var ncmb = new NCMB("2dd3d31c42f40b277f40e9158c900d68121161db94f963d53bcb004f1c6
       titleElement.innerHTML = '設定';
     }
     });
-  </script>
-
+</script>
 </head>
+
 <body>
   <!-- スタック -->
   <ons-navigator var="myNavigator" page="index.html"></ons-navigator> 
@@ -328,6 +111,11 @@ var ncmb = new NCMB("2dd3d31c42f40b277f40e9158c900d68121161db94f963d53bcb004f1c6
     <ons-icon icon="spinner" size="28px" spin></ons-icon>
   </ons-modal>
 
+<script src="react.js"></script>
+<script src="react-dom.js"></script>
+<script src="onsenui.js"></script>
+<script src="react-onsenui.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/6.1.19/browser.min.js"></script>
   
 </body>
 </html>
